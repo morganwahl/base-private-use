@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from __future__ import print_function, unicode_literals
+
 # The first PUP is used for basic data. The last 16 bit of the codepoint are the data.
 _BASIC_FIRST = 0x0F0000
 # The second PUP is for padded data.
@@ -23,7 +25,6 @@ def encode(data):
     codepoints = ''
     while True:
         chunk = data.read(2)
-        print(chunk)
         if len(chunk) == 2:
             base = _BASIC_FIRST
             chunk = (chunk[0] << 8) + chunk[1]
@@ -35,7 +36,9 @@ def encode(data):
         codepoint = base + chunk
         # Use BMP PUA for last two codepoints in each plane.
         if (codepoint % 0x10000) in (0xFFFE, 0x0FFFF):
-            codepoint = 0xE800 + (codepoint % 0x100) + (codepoint >> 16)
+            plane = codepoint >> 16
+            offset = ((plane - 0xf) * 0x100) + (codepoint % 0x100)
+            codepoint = 0xE800 + offset
         codepoints += chr(codepoint)
     return codepoints
 
@@ -45,8 +48,10 @@ def decode(codepoints):
     for cp in codepoints:
         cp = ord(cp)
         if cp < 0x10000:
-            cp -= 0xE800
-            cp = ((cp >> 8) << 16) + (cp % 8) + 0xFF00
+            offset = cp - 0xE800
+            plane = (offset // 0x100) + 0xf
+            least_byte = offset % 0x100
+            cp = (plane * 0x10000) + 0xff00 + least_byte
         if cp >= 0x100000:
             # TODO handle non-byte-padded data
             chunk = cp % 0x100
@@ -54,7 +59,6 @@ def decode(codepoints):
         else:
             chunk = cp % 0x10000
             data += bytes((chunk // 0x100, chunk % 0x100))
-        print(hex(cp), hex(chunk), data)
     return data
 
 
