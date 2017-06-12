@@ -60,15 +60,3 @@ def decode(codepoints):
             chunk = cp % 0x10000
             data += bytes((chunk // 0x100, chunk % 0x100))
     return data
-
-
-def main():
-    import sys
-    data = sys.argv[1].encode('utf-8')
-    encoded = encode(data)
-    roundtrip = decode(encoded)
-    print(data, encoded, roundtrip, sep='\n')
-
-
-if __name__ == '__main__':
-    main()
