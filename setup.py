@@ -9,5 +9,6 @@ setup(
     author_email='morgan.wahl@gmail.com',
     license='GPLv3',
     packages=['base_private'],
+    test_suite='base_private.tests',
     zip_safe=False,
 )
