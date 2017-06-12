@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function, unicode_literals
+from __future__ import print_function, unicode_literals, divison
 
 # The first PUP is used for basic data. The last 16 bit of the codepoint are the data.
 _BASIC_FIRST = 0x0F0000
@@ -18,24 +18,30 @@ _BASIC_FIRST = 0x0F0000
 _PADDING_FIRST = 0x100000
 
 
-def encode(data):
-    # TODO Handle non-byte-padded bit sequences.
-    from io import BytesIO
-    data = BytesIO(data)
+def encode_bits(data, bits):
+    """
+    Data is bytes. bits is total number of bits in data. least-significant bits of last byte will be ignored if bits is not a multiple of eight.
+    """
     codepoints = ''
-    while True:
-        chunk = data.read(2)
-        if len(chunk) == 2:
-            base = _BASIC_FIRST
-            chunk = (chunk[0] << 8) + chunk[1]
-        elif len(chunk) == 1:
-            base = _PADDING_FIRST
-            chunk = 0x0100 + chunk[0]
+    sigbits = bits % 16
+    # (n + 1) // 2 is the same as math.ceil(n / 2)
+    chunk_count = (len(data) + 1) // 2
+    for chunk_offset in range(chunk_count):
+        offset = chunk_offset * 2
+        last_chunk = (chunk_offset + 1 == chunk_count)
+        chunk_data = data[offset:offset+2]
+        chunk_int = chunk_data[0] * 0x100 + chunk_data[1]
+        if last_chunk and sigbits:
+            pad = 16 - sigbits
+            base = 0x00100000 + (0x10000 >> pad)
+            val = chunk_int >> (pad)
+            codepoint += chr(base + val)
         else:
-            break
-        codepoint = base + chunk
+            base = 0x000F0000
+            val = chunk_int
+        codepoint = base + val
         # Use BMP PUA for last two codepoints in each plane.
-        if (codepoint % 0x10000) in (0xFFFE, 0x0FFFF):
+        if (codepoint % 0x10000) in (0xFFFE, 0xFFFF):
             plane = codepoint >> 16
             offset = ((plane - 0xf) * 0x100) + (codepoint % 0x100)
             codepoint = 0xE800 + offset
@@ -44,6 +50,9 @@ def encode(data):
 
 
 def decode(codepoints):
+    """
+    Returns a tuple of (bytes, bits) where bits is the number of bits. Ignore most-significant bits in last byte of bytes if bits is not a multiple of 8.
+    """
     data = b''
     for cp in codepoints:
         cp = ord(cp)
