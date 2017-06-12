@@ -2,7 +2,11 @@ from __future__ import unicode_literals
 
 import unittest
 
+from hypothesis import given
+from hypothesis.strategies import binary
+
 from base_private import decode, encode
+
 
 class AlgoritmTest(unittest.TestCase):
     def test_encode(self):
@@ -27,3 +31,13 @@ class AlgoritmTest(unittest.TestCase):
         ):
             with self.subTest(codepoints=codepoints):
                 self.assertEqual(decode(codepoints), decoded)
+
+
+class PropertiesTest(unittest.TestCase):
+    @given(binary())
+    def test_roundtrip(self, bits):
+        print(bits)
+        self.assertEqual(
+            bits,
+            decode(encode(bits)),
+        )

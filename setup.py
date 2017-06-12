@@ -10,5 +10,6 @@ setup(
     license='GPLv3',
     packages=['base_private'],
     test_suite='base_private.tests',
+    tests_require=['hypothesis'],
     zip_safe=False,
 )
