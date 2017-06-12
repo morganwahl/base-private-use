@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function, unicode_literals, divison
+from __future__ import print_function, unicode_literals, divison_operator
 
 # The first PUP is used for basic data. The last 16 bit of the codepoint are the data.
 _BASIC_FIRST = 0x0F0000
