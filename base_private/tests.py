@@ -2,10 +2,10 @@ from __future__ import unicode_literals
 
 import unittest
 
-from base_private import encode
+from base_private import decode, encode
 
 class AlgoritmTest(unittest.TestCase):
-    def test(self):
+    def test_encode(self):
         for bits, encoded in (
                 (b'\x00\x00', '\U000F0000'),
                 (b'\x00', '\U00100100'),
@@ -17,4 +17,13 @@ class AlgoritmTest(unittest.TestCase):
             with self.subTest(bits=bits):
                 self.assertEqual(encode(bits), encoded)
 
-        
+    def test_decode(self):
+        for codepoints, decoded in (
+                ('', b''),
+                ('\U000F0000', b'\x00\x00'),
+                ('\U00100100', b'\x00'),
+                ('\ue8fe', b'\xff\xfe'),
+                ('\ue8ff', b'\xff\xff'),
+        ):
+            with self.subTest(codepoints=codepoints):
+                self.assertEqual(decode(codepoints), decoded)
