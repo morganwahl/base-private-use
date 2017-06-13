@@ -1,12 +1,9 @@
 # base-private-use
 Encode arbitrary bits to a sequence of private-use codepoints.
 
-Tests: [![CircleCI](https://circleci.com/gh/morganwahl/base-private-use.svg?style=svg)](https://circleci.com/gh/morganwahl/base-private-use)
-
+[![CircleCI](https://circleci.com/gh/morganwahl/base-private-use.svg?style=svg)](https://circleci.com/gh/morganwahl/base-private-use)
 [![codecov](https://codecov.io/gh/morganwahl/base-private-use/branch/master/graph/badge.svg)](https://codecov.io/gh/morganwahl/base-private-use)
-
 [![Build Status](https://travis-ci.org/morganwahl/base-private-use.svg?branch=master)](https://travis-ci.org/morganwahl/base-private-use)
-
 [![Coverage Status](https://coveralls.io/repos/github/morganwahl/base-private-use/badge.svg?branch=master)](https://coveralls.io/github/morganwahl/base-private-use?branch=master)
 
 Fit 280 bytes of data into a tweet!
