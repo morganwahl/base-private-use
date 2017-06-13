@@ -42,7 +42,6 @@ class PropertiesTest(unittest.TestCase):
             data = bytearray(data)
             data[-1] = ((data[-1] >> pad) << pad)
             data = bytes(data)
-        print(data, pad, bits)
         self.assertEqual(
             (data, bits),
             decode(encode(data, bits)),
