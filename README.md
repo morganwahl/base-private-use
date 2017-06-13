@@ -10,12 +10,12 @@ Most systems will leave private-use characters unmolested, as they should. This 
 
 Fit 280 bytes of data into a tweet!
 
-The API is slightly awkward because it supports _bits_ that aren't necessarily byte-padded.
+The bits API is:
 
 ```py
 import base_private
 
-codepoints = base_private.encode(a_bunch_of_bytes, number_of_bits_i_care_about)
+codepoints = base_private.encode_bits(a_bunch_of_bytes, number_of_bits_i_care_about)
 
-original_bytes, number_of_bits = base_private.decode(codepoints)
+original_bytes, number_of_bits = base_private.decode_bits(codepoints)
 ```

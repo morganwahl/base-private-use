@@ -18,7 +18,7 @@ _BASIC_FIRST = 0x0F0000
 _PADDING_FIRST = 0x100000
 
 
-def encode(data, bits):
+def encode_bits(data, bits):
     """
     Data is bytes. bits is total number of bits in data. least-significant bits of last byte will be ignored if bits is not a multiple of eight.
     """
@@ -52,7 +52,7 @@ def encode(data, bits):
     return codepoints
 
 
-def decode(codepoints):
+def decode_bits(codepoints):
     """
     Returns a tuple of (bytes, bits) where bits is the number of bits. Ignore least-significant bits in last byte of bytes if bits is not a multiple of 8.
     """
