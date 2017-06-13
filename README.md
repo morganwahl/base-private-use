@@ -10,6 +10,16 @@ Most systems will leave private-use characters unmolested, as they should. This 
 
 Fit 280 bytes of data into a tweet!
 
+Simple, byte-padded API:
+
+```py
+import base_private
+
+string = base_private.encode(some_bytes)
+
+original_bytes = base_private.decode(string)
+```
+
 The bits API is:
 
 ```py

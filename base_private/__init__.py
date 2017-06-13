@@ -52,6 +52,11 @@ def encode_bits(data, bits):
     return codepoints
 
 
+def encode(data):
+    "Given bytes, return a string with the byte data encoded using private-use characters."
+    return encode_bits(data, len(data) * 8)
+
+
 def decode_bits(codepoints):
     """
     Returns a tuple of (bytes, bits) where bits is the number of bits. Ignore least-significant bits in last byte of bytes if bits is not a multiple of 8.
@@ -81,3 +86,8 @@ def decode_bits(codepoints):
     if pad:
         bits = (bits - (pad % 8))
     return data, bits
+
+
+def decode(codepoints):
+    "Given a string produced by encode(), return the original bytes."
+    return decode_bits(codepoints)[0]
