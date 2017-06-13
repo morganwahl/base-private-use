@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='base_private',
-    version='0.3',
+    version='0.4',
     description='Encode arbitrary bits in private-use codepoints.',
     url='https://github.com/morganwahl/base-private-use',
     author='Morgan Wahl',
