@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from __future__ import print_function, unicode_literals, divison_operator
+from __future__ import print_function, unicode_literals, division
 
 # The first PUP is used for basic data. The last 16 bit of the codepoint are the data.
 _BASIC_FIRST = 0x0F0000
@@ -18,14 +18,18 @@ _BASIC_FIRST = 0x0F0000
 _PADDING_FIRST = 0x100000
 
 
-def encode_bits(data, bits):
+def encode(data, bits):
     """
     Data is bytes. bits is total number of bits in data. least-significant bits of last byte will be ignored if bits is not a multiple of eight.
     """
+    if data == b'' or bits < 1:
+        return ''
     codepoints = ''
     sigbits = bits % 16
-    # (n + 1) // 2 is the same as math.ceil(n / 2)
-    chunk_count = (len(data) + 1) // 2
+    # Pad data with a null byte to an even number of bytes.
+    if len(data) % 2:
+        data += b'\x00'
+    chunk_count = len(data) // 2
     for chunk_offset in range(chunk_count):
         offset = chunk_offset * 2
         last_chunk = (chunk_offset + 1 == chunk_count)
@@ -35,7 +39,6 @@ def encode_bits(data, bits):
             pad = 16 - sigbits
             base = 0x00100000 + (0x10000 >> pad)
             val = chunk_int >> (pad)
-            codepoint += chr(base + val)
         else:
             base = 0x000F0000
             val = chunk_int
@@ -51,9 +54,10 @@ def encode_bits(data, bits):
 
 def decode(codepoints):
     """
-    Returns a tuple of (bytes, bits) where bits is the number of bits. Ignore most-significant bits in last byte of bytes if bits is not a multiple of 8.
+    Returns a tuple of (bytes, bits) where bits is the number of bits. Ignore least-significant bits in last byte of bytes if bits is not a multiple of 8.
     """
     data = b''
+    pad = 0
     for cp in codepoints:
         cp = ord(cp)
         if cp < 0x10000:
@@ -61,11 +65,19 @@ def decode(codepoints):
             plane = (offset // 0x100) + 0xf
             least_byte = offset % 0x100
             cp = (plane * 0x10000) + 0xff00 + least_byte
-        if cp >= 0x100000:
-            # TODO handle non-byte-padded data
-            chunk = cp % 0x100
-            data += bytes((chunk,))
+        if cp >= 0x00100000:
+            for maybe_pad in range(1, 16):
+                if cp >= 0x00100000 + (0x10000 >> maybe_pad):
+                    pad = maybe_pad
+                    break
         else:
-            chunk = cp % 0x10000
-            data += bytes((chunk // 0x100, chunk % 0x100))
-    return data
+            pad = 0
+        val = cp % (0x10000 >> pad)
+        val = val << pad
+        data += bytes((val // 0x100,))
+        if pad < 8:
+            data += bytes((val % 0x100,))
+    bits = len(data) * 8
+    if pad:
+        bits = (bits - (pad % 8))
+    return data, bits
