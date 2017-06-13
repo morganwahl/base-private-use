@@ -5,7 +5,7 @@ import unittest
 from hypothesis import given
 from hypothesis.strategies import binary, integers
 
-from base_private import decode_bits, encode_bits
+from base_private import decode, decode_bits, encode, encode_bits
 
 
 class AlgoritmTest(unittest.TestCase):
@@ -46,3 +46,7 @@ class PropertiesTest(unittest.TestCase):
             (data, bits),
             decode_bits(encode_bits(data, bits)),
         )
+
+    @given(binary())
+    def test_roundtrip_bytes(self, data):
+        self.assertEqual(data, decode(encode(data)))
